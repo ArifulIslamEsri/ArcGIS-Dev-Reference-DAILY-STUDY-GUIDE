@@ -1,0 +1,1704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArcGIS Ecosystem — Developer Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e17;
+    --bg2: #111827;
+    --bg3: #1a2235;
+    --surface: #1e2d42;
+    --border: rgba(99,179,237,0.15);
+    --border2: rgba(99,179,237,0.3);
+    --accent: #3b82f6;
+    --accent2: #06b6d4;
+    --accent3: #8b5cf6;
+    --accent4: #f59e0b;
+    --accent5: #10b981;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --mono: 'IBM Plex Mono', monospace;
+    --display: 'Syne', sans-serif;
+    --body: 'DM Sans', sans-serif;
+
+    --sdk-js: #3b82f6;
+    --sdk-exb: #06b6d4;
+    --sdk-pro: #8b5cf6;
+    --sdk-ent: #f59e0b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 15px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: 260px;
+    height: 100vh;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-logo {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-logo .title {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 16px;
+    color: var(--text);
+    letter-spacing: -0.3px;
+    line-height: 1.2;
+  }
+  .sidebar-logo .sub {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    margin-top: 4px;
+    letter-spacing: 0.05em;
+  }
+
+  .nav-section {
+    padding: 16px 0 8px;
+  }
+  .nav-section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--text3);
+    padding: 0 20px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 20px;
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+    font-size: 13.5px;
+    color: var(--text2);
+  }
+  .nav-item:hover { background: rgba(59,130,246,0.06); color: var(--text); }
+  .nav-item.active {
+    border-left-color: var(--accent);
+    background: rgba(59,130,246,0.1);
+    color: var(--text);
+  }
+  .nav-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ── MAIN CONTENT ── */
+  .main {
+    margin-left: 260px;
+    min-height: 100vh;
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    position: sticky; top: 0;
+    background: rgba(10,14,23,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 50;
+  }
+  .topbar-tabs {
+    display: flex;
+    gap: 4px;
+  }
+  .tab-btn {
+    padding: 6px 16px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text2);
+    font-family: var(--mono);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.04em;
+  }
+  .tab-btn:hover { border-color: var(--border2); color: var(--text); }
+  .tab-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .tab-btn[data-sdk="exb"].active { background: var(--sdk-exb); border-color: var(--sdk-exb); }
+  .tab-btn[data-sdk="pro"].active { background: var(--sdk-pro); border-color: var(--sdk-pro); }
+  .tab-btn[data-sdk="ent"].active { background: var(--sdk-ent); border-color: var(--sdk-ent); }
+
+  .topbar-right {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+  }
+
+  /* ── PAGE ── */
+  .page { display: none; padding: 48px 40px; max-width: 960px; }
+  .page.active { display: block; }
+
+  /* ── HERO ── */
+  .hero {
+    margin-bottom: 56px;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--accent2);
+    border: 1px solid rgba(6,182,212,0.3);
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: var(--display);
+    font-size: 48px;
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -1.5px;
+    margin-bottom: 16px;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero p {
+    font-size: 16px;
+    color: var(--text2);
+    max-width: 580px;
+    line-height: 1.7;
+  }
+
+  /* ── SDK CARDS (home overview) ── */
+  .sdk-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+  .sdk-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .sdk-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--card-color);
+    opacity: 0.7;
+  }
+  .sdk-card:hover {
+    border-color: var(--card-color);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  }
+  .sdk-card-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--card-color);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+  .sdk-card h3 {
+    font-family: var(--display);
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.3px;
+  }
+  .sdk-card p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+  .sdk-card-footer {
+    margin-top: 16px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .pill {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid currentColor;
+    opacity: 0.7;
+  }
+
+  /* ── SECTION HEADINGS ── */
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--text3);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .section-title {
+    font-family: var(--display);
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+  .section-desc {
+    color: var(--text2);
+    font-size: 14px;
+    margin-bottom: 32px;
+    max-width: 600px;
+  }
+
+  .section-block {
+    margin-bottom: 56px;
+  }
+
+  /* ── CONCEPT CARDS ── */
+  .concept-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .concept-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    transition: border-color 0.15s;
+  }
+  .concept-card:hover { border-color: var(--border2); }
+  .concept-card .icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    margin-bottom: 12px;
+    background: rgba(59,130,246,0.1);
+  }
+  .concept-card h4 {
+    font-family: var(--display);
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .concept-card p { font-size: 12px; color: var(--text2); line-height: 1.6; }
+
+  /* ── CODE BLOCKS ── */
+  .code-block {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid var(--border);
+  }
+  .code-filename {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text2);
+  }
+  .code-lang {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 0.08em;
+  }
+  pre {
+    padding: 20px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.7;
+  }
+  .kw { color: #c792ea; }
+  .fn { color: #82aaff; }
+  .str { color: #c3e88d; }
+  .cm { color: #546e7a; font-style: italic; }
+  .num { color: #f78c6c; }
+  .cls { color: #ffcb6b; }
+  .prop { color: #89ddff; }
+  .op { color: #89ddff; }
+
+  /* ── FLOW DIAGRAM ── */
+  .flow-diagram {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 28px;
+    overflow-x: auto;
+  }
+
+  /* ── INFO BOXES ── */
+  .info-box {
+    border-left: 3px solid var(--accent);
+    background: rgba(59,130,246,0.06);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    font-size: 13.5px;
+  }
+  .info-box.tip { border-color: var(--accent5); background: rgba(16,185,129,0.06); }
+  .info-box.warn { border-color: var(--accent4); background: rgba(245,158,11,0.06); }
+  .info-box.pro-tip {
+    border-color: var(--accent3);
+    background: rgba(139,92,246,0.06);
+  }
+  .info-box strong {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    display: block;
+    margin-bottom: 6px;
+    opacity: 0.8;
+    text-transform: uppercase;
+  }
+
+  /* ── COMPARISON TABLE ── */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 28px;
+    font-size: 13px;
+  }
+  .compare-table th {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .compare-table td {
+    padding: 11px 16px;
+    border-bottom: 1px solid rgba(99,179,237,0.07);
+    color: var(--text2);
+    vertical-align: top;
+  }
+  .compare-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .compare-table td:first-child { color: var(--text); font-weight: 500; }
+
+  .badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+  }
+  .badge-js { background: rgba(59,130,246,0.15); color: #93c5fd; }
+  .badge-exb { background: rgba(6,182,212,0.15); color: #67e8f9; }
+  .badge-pro { background: rgba(139,92,246,0.15); color: #c4b5fd; }
+  .badge-ent { background: rgba(245,158,11,0.15); color: #fcd34d; }
+  .badge-yes { background: rgba(16,185,129,0.15); color: #6ee7b7; }
+  .badge-no { background: rgba(239,68,68,0.15); color: #fca5a5; }
+
+  /* ── STEP LIST ── */
+  .step-list { list-style: none; counter-reset: steps; margin-bottom: 28px; }
+  .step-list li {
+    counter-increment: steps;
+    padding: 14px 0 14px 52px;
+    position: relative;
+    border-bottom: 1px solid rgba(99,179,237,0.07);
+    font-size: 14px;
+    color: var(--text2);
+  }
+  .step-list li:last-child { border-bottom: none; }
+  .step-list li::before {
+    content: counter(steps);
+    position: absolute;
+    left: 0; top: 14px;
+    width: 28px; height: 28px;
+    background: rgba(59,130,246,0.1);
+    border: 1px solid rgba(59,130,246,0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 500;
+    text-align: center;
+    line-height: 28px;
+  }
+  .step-list li strong { color: var(--text); font-weight: 500; }
+
+  /* ── CHEATSHEET GRID ── */
+  .cheat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .cheat-item {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .cheat-item-header {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cheat-item pre {
+    padding: 14px 16px;
+    font-size: 12px;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--surface); border-radius: 3px; }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 40px 0;
+  }
+
+  /* Quick reference tag */
+  .qr-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 3px 10px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+
+  /* Highlight row */
+  .highlight-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .highlight-box {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .highlight-box h4 {
+    font-family: var(--display);
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .highlight-box ul { padding-left: 18px; color: var(--text2); font-size: 13px; }
+  .highlight-box ul li { margin-bottom: 4px; }
+
+  /* Mindmap/concept flow */
+  .mindmap-svg { width: 100%; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="title">ArcGIS Dev<br>Reference</div>
+    <div class="sub">// DAILY STUDY GUIDE</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Overview</div>
+    <div class="nav-item active" onclick="goto('home')">
+      <span class="nav-dot" style="background:#64748b"></span>Home & Ecosystem
+    </div>
+    <div class="nav-item" onclick="goto('compare')">
+      <span class="nav-dot" style="background:#64748b"></span>SDK Comparison
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Maps SDK JS</div>
+    <div class="nav-item" onclick="goto('js-core')">
+      <span class="nav-dot" style="background:var(--sdk-js)"></span>Core Concepts
+    </div>
+    <div class="nav-item" onclick="goto('js-layers')">
+      <span class="nav-dot" style="background:var(--sdk-js)"></span>Layers & Data
+    </div>
+    <div class="nav-item" onclick="goto('js-widgets')">
+      <span class="nav-dot" style="background:var(--sdk-js)"></span>Widgets & UI
+    </div>
+    <div class="nav-item" onclick="goto('js-code')">
+      <span class="nav-dot" style="background:var(--sdk-js)"></span>Code Examples
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Experience Builder</div>
+    <div class="nav-item" onclick="goto('exb-core')">
+      <span class="nav-dot" style="background:var(--sdk-exb)"></span>Core Concepts
+    </div>
+    <div class="nav-item" onclick="goto('exb-widget')">
+      <span class="nav-dot" style="background:var(--sdk-exb)"></span>Custom Widgets
+    </div>
+    <div class="nav-item" onclick="goto('exb-code')">
+      <span class="nav-dot" style="background:var(--sdk-exb)"></span>Code Examples
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">ArcGIS Pro SDK</div>
+    <div class="nav-item" onclick="goto('pro-core')">
+      <span class="nav-dot" style="background:var(--sdk-pro)"></span>Core Concepts
+    </div>
+    <div class="nav-item" onclick="goto('pro-code')">
+      <span class="nav-dot" style="background:var(--sdk-pro)"></span>Code Examples
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Enterprise SDK</div>
+    <div class="nav-item" onclick="goto('ent-core')">
+      <span class="nav-dot" style="background:var(--sdk-ent)"></span>Core Concepts
+    </div>
+    <div class="nav-item" onclick="goto('ent-code')">
+      <span class="nav-dot" style="background:var(--sdk-ent)"></span>Code Examples
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Pro Tips</div>
+    <div class="nav-item" onclick="goto('tips')">
+      <span class="nav-dot" style="background:#f472b6"></span>Claude's Insights
+    </div>
+    <div class="nav-item" onclick="goto('cheatsheet')">
+      <span class="nav-dot" style="background:#f472b6"></span>Cheat Sheet
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-tabs">
+      <button class="tab-btn active" data-sdk="js" onclick="switchSDK('js')">Maps SDK JS</button>
+      <button class="tab-btn" data-sdk="exb" onclick="switchSDK('exb')">ExB Dev</button>
+      <button class="tab-btn" data-sdk="pro" onclick="switchSDK('pro')">Pro SDK</button>
+      <button class="tab-btn" data-sdk="ent" onclick="switchSDK('ent')">Enterprise SDK</button>
+    </div>
+    <div class="topbar-right">v// arcgis-dev-ref</div>
+  </div>
+
+  <!-- ====== HOME ====== -->
+  <div class="page active" id="page-home">
+    <div class="hero">
+      <div class="hero-badge">◉ DEVELOPER REFERENCE 2024</div>
+      <h1>ArcGIS <span>Developer</span><br>Ecosystem</h1>
+      <p>Four SDKs. One platform. This guide covers everything from browser maps to desktop geoprocessing to enterprise REST APIs — built for daily review.</p>
+    </div>
+
+    <div class="sdk-grid">
+      <div class="sdk-card" style="--card-color: var(--sdk-js)" onclick="goto('js-core')">
+        <div class="sdk-card-label">● Maps SDK for JavaScript</div>
+        <h3>Browser-based Maps</h3>
+        <p>Build interactive 2D/3D maps for the web. The most used ArcGIS SDK — runs in any browser via CDN or npm.</p>
+        <div class="sdk-card-footer">
+          <span class="pill" style="color:var(--sdk-js)">2D / 3D</span>
+          <span class="pill" style="color:var(--sdk-js)">TypeScript</span>
+          <span class="pill" style="color:var(--sdk-js)">React / Vue</span>
+        </div>
+      </div>
+      <div class="sdk-card" style="--card-color: var(--sdk-exb)" onclick="goto('exb-core')">
+        <div class="sdk-card-label">● Experience Builder Dev Edition</div>
+        <h3>No-code + Custom Widgets</h3>
+        <p>Build web apps by dragging widgets. Dev Edition lets you create your own custom React widgets on top of ExB.</p>
+        <div class="sdk-card-footer">
+          <span class="pill" style="color:var(--sdk-exb)">React</span>
+          <span class="pill" style="color:var(--sdk-exb)">Drag & Drop</span>
+          <span class="pill" style="color:var(--sdk-exb)">Jimu</span>
+        </div>
+      </div>
+      <div class="sdk-card" style="--card-color: var(--sdk-pro)" onclick="goto('pro-core')">
+        <div class="sdk-card-label">● ArcGIS Pro SDK for .NET</div>
+        <h3>Desktop GIS Automation</h3>
+        <p>Extend ArcGIS Pro with custom tools, add-ins, and geoprocessing tools using C# and the Pro SDK framework.</p>
+        <div class="sdk-card-footer">
+          <span class="pill" style="color:var(--sdk-pro)">C# / .NET</span>
+          <span class="pill" style="color:var(--sdk-pro)">WPF / MVVM</span>
+          <span class="pill" style="color:var(--sdk-pro)">Add-ins</span>
+        </div>
+      </div>
+      <div class="sdk-card" style="--card-color: var(--sdk-ent)" onclick="goto('ent-core')">
+        <div class="sdk-card-label">● ArcGIS Enterprise SDK</div>
+        <h3>Server-side Extensions</h3>
+        <p>Build Server Object Extensions (SOEs) and Interceptors to extend ArcGIS Server REST endpoints.</p>
+        <div class="sdk-card-footer">
+          <span class="pill" style="color:var(--sdk-ent)">Java / .NET</span>
+          <span class="pill" style="color:var(--sdk-ent)">SOE / SOI</span>
+          <span class="pill" style="color:var(--sdk-ent)">REST API</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-label">Ecosystem Overview</div>
+      <div class="section-title">How the SDKs fit together</div>
+      <div class="section-desc">Each SDK addresses a different layer of the ArcGIS platform. You'll often use more than one in a real project.</div>
+
+      <div class="flow-diagram">
+        <svg viewBox="0 0 860 200" class="mindmap-svg">
+          <defs>
+            <marker id="arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+              <path d="M2 1L8 5L2 9" fill="none" stroke="#475569" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </marker>
+          </defs>
+          <!-- Enterprise platform -->
+          <rect x="330" y="70" width="200" height="60" rx="8" fill="rgba(245,158,11,0.1)" stroke="rgba(245,158,11,0.4)" stroke-width="1"/>
+          <text x="430" y="97" text-anchor="middle" font-family="Syne,sans-serif" font-size="13" font-weight="700" fill="#fcd34d">ArcGIS Enterprise</text>
+          <text x="430" y="115" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" fill="#94a3b8">REST APIs / Portal / Server</text>
+
+          <!-- JS SDK -->
+          <rect x="20" y="20" width="180" height="56" rx="8" fill="rgba(59,130,246,0.1)" stroke="rgba(59,130,246,0.4)" stroke-width="1"/>
+          <text x="110" y="44" text-anchor="middle" font-family="Syne,sans-serif" font-size="12" font-weight="700" fill="#93c5fd">Maps SDK JS</text>
+          <text x="110" y="62" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" fill="#64748b">Browser maps</text>
+          <line x1="200" y1="48" x2="328" y2="88" stroke="#475569" stroke-width="1" marker-end="url(#arr2)"/>
+
+          <!-- ExB -->
+          <rect x="20" y="124" width="180" height="56" rx="8" fill="rgba(6,182,212,0.1)" stroke="rgba(6,182,212,0.4)" stroke-width="1"/>
+          <text x="110" y="148" text-anchor="middle" font-family="Syne,sans-serif" font-size="12" font-weight="700" fill="#67e8f9">Experience Builder</text>
+          <text x="110" y="166" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" fill="#64748b">Web app builder</text>
+          <line x1="200" y1="152" x2="328" y2="112" stroke="#475569" stroke-width="1" marker-end="url(#arr2)"/>
+
+          <!-- Pro SDK -->
+          <rect x="660" y="20" width="180" height="56" rx="8" fill="rgba(139,92,246,0.1)" stroke="rgba(139,92,246,0.4)" stroke-width="1"/>
+          <text x="750" y="44" text-anchor="middle" font-family="Syne,sans-serif" font-size="12" font-weight="700" fill="#c4b5fd">Pro SDK (.NET)</text>
+          <text x="750" y="62" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" fill="#64748b">Desktop add-ins</text>
+          <line x1="660" y1="48" x2="532" y2="88" stroke="#475569" stroke-width="1" marker-end="url(#arr2)"/>
+
+          <!-- Ent SDK -->
+          <rect x="660" y="124" width="180" height="56" rx="8" fill="rgba(245,158,11,0.1)" stroke="rgba(245,158,11,0.3)" stroke-width="1"/>
+          <text x="750" y="148" text-anchor="middle" font-family="Syne,sans-serif" font-size="12" font-weight="700" fill="#fcd34d">Enterprise SDK</text>
+          <text x="750" y="166" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" fill="#64748b">SOE / SOI server</text>
+          <line x1="660" y1="152" x2="532" y2="112" stroke="#475569" stroke-width="1" marker-end="url(#arr2)"/>
+        </svg>
+      </div>
+
+      <div class="info-box tip">
+        <strong>💡 Quick Mental Model</strong>
+        JS SDK = what end users see in the browser. ExB = same but drag-and-drop. Pro SDK = power user desktop tools. Enterprise SDK = custom server logic. All four talk to the same ArcGIS platform in the middle.
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== COMPARE ====== -->
+  <div class="page" id="page-compare">
+    <div class="hero" style="margin-bottom:32px">
+      <div class="section-label">Reference</div>
+      <div class="section-title">SDK Comparison Matrix</div>
+      <div class="section-desc">Choose the right SDK for your task at a glance.</div>
+    </div>
+
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Feature / Capability</th>
+          <th>Maps SDK JS</th>
+          <th>ExB Dev</th>
+          <th>Pro SDK</th>
+          <th>Enterprise SDK</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Language</td><td>JS / TS</td><td>React / TS</td><td>C# / .NET</td><td>Java / C#</td></tr>
+        <tr><td>Environment</td><td>Browser</td><td>Browser</td><td>Desktop (Windows)</td><td>Server</td></tr>
+        <tr><td>2D Maps</td><td><span class="badge badge-yes">Yes</span></td><td><span class="badge badge-yes">Yes</span></td><td><span class="badge badge-yes">Yes</span></td><td><span class="badge badge-no">No</span></td></tr>
+        <tr><td>3D / SceneView</td><td><span class="badge badge-yes">Yes</span></td><td><span class="badge badge-yes">Yes</span></td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-no">No</span></td></tr>
+        <tr><td>Custom geoprocessing</td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-yes">Yes</span></td><td><span class="badge badge-yes">Yes</span></td></tr>
+        <tr><td>REST endpoint extension</td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-yes">Yes (SOE)</span></td></tr>
+        <tr><td>No-code app builder</td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-yes">Yes</span></td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-no">No</span></td></tr>
+        <tr><td>Sketch / edit features</td><td><span class="badge badge-yes">Yes</span></td><td><span class="badge badge-yes">Yes</span></td><td><span class="badge badge-yes">Yes</span></td><td><span class="badge badge-no">No</span></td></tr>
+        <tr><td>Intercept map requests</td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-yes">Yes (SOI)</span></td></tr>
+        <tr><td>Data access / queries</td><td><span class="badge badge-yes">Yes</span></td><td><span class="badge badge-yes">Yes</span></td><td><span class="badge badge-yes">Yes</span></td><td><span class="badge badge-yes">Yes</span></td></tr>
+        <tr><td>Mobile support</td><td><span class="badge badge-yes">Via browser</span></td><td><span class="badge badge-yes">Via browser</span></td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-no">No</span></td></tr>
+        <tr><td>Learning curve</td><td>Medium</td><td>Low (builder) / High (custom)</td><td>High</td><td>Very High</td></tr>
+        <tr><td>Best for</td><td>Web dev teams</td><td>GIS analysts + devs</td><td>GIS power users</td><td>Enterprise architects</td></tr>
+      </tbody>
+    </table>
+
+    <div class="info-box pro-tip">
+      <strong>🎯 Which to learn first?</strong>
+      If you're a web developer — start with Maps SDK JS. If you're a GIS analyst wanting to automate ArcGIS Pro — Pro SDK. If you need to extend Enterprise REST endpoints — Enterprise SDK. ExB Dev Edition is useful when your org uses ArcGIS Online/Enterprise and wants custom apps fast.
+    </div>
+  </div>
+
+  <!-- ====== JS CORE ====== -->
+  <div class="page" id="page-js-core">
+    <div class="hero" style="margin-bottom:36px">
+      <div class="hero-badge" style="color:var(--sdk-js);border-color:rgba(59,130,246,0.3)">● MAPS SDK FOR JAVASCRIPT</div>
+      <div class="section-title">Core Concepts</div>
+      <div class="section-desc">The Maps SDK JS is built around a few key objects. Master these and everything else makes sense.</div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-label">Mental Model</div>
+      <div class="flow-diagram">
+        <svg viewBox="0 0 800 120" class="mindmap-svg">
+          <defs>
+            <marker id="arr3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+              <path d="M2 1L8 5L2 9" fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </marker>
+          </defs>
+          <!-- Map -->
+          <rect x="20" y="30" width="140" height="60" rx="8" fill="rgba(59,130,246,0.1)" stroke="rgba(59,130,246,0.5)" stroke-width="1"/>
+          <text x="90" y="56" text-anchor="middle" font-family="Syne,sans-serif" font-size="13" font-weight="700" fill="#93c5fd">Map</text>
+          <text x="90" y="74" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" fill="#64748b">data container</text>
+          <line x1="160" y1="60" x2="198" y2="60" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#arr3)"/>
+
+          <!-- View -->
+          <rect x="200" y="30" width="140" height="60" rx="8" fill="rgba(59,130,246,0.1)" stroke="rgba(59,130,246,0.5)" stroke-width="1"/>
+          <text x="270" y="56" text-anchor="middle" font-family="Syne,sans-serif" font-size="13" font-weight="700" fill="#93c5fd">MapView</text>
+          <text x="270" y="74" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" fill="#64748b">renders the map</text>
+          <line x1="340" y1="60" x2="378" y2="60" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#arr3)"/>
+
+          <!-- Layers -->
+          <rect x="380" y="30" width="140" height="60" rx="8" fill="rgba(59,130,246,0.1)" stroke="rgba(59,130,246,0.5)" stroke-width="1"/>
+          <text x="450" y="56" text-anchor="middle" font-family="Syne,sans-serif" font-size="13" font-weight="700" fill="#93c5fd">Layers</text>
+          <text x="450" y="74" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" fill="#64748b">data sources</text>
+          <line x1="520" y1="60" x2="558" y2="60" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#arr3)"/>
+
+          <!-- Widgets -->
+          <rect x="560" y="30" width="140" height="60" rx="8" fill="rgba(59,130,246,0.1)" stroke="rgba(59,130,246,0.5)" stroke-width="1"/>
+          <text x="630" y="56" text-anchor="middle" font-family="Syne,sans-serif" font-size="13" font-weight="700" fill="#93c5fd">Widgets</text>
+          <text x="630" y="74" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" fill="#64748b">UI controls</text>
+
+          <!-- Label -->
+          <text x="270" y="108" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#475569">Map holds layers. View renders. Widgets add UI.</text>
+        </svg>
+      </div>
+
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="icon" style="background:rgba(59,130,246,0.1)">🗺</div>
+          <h4>Map object</h4>
+          <p>Holds layers and a basemap. Has no visual output by itself — it's just the data model. Think of it as a "scene graph".</p>
+        </div>
+        <div class="concept-card">
+          <div class="icon" style="background:rgba(6,182,212,0.1)">👁</div>
+          <h4>MapView / SceneView</h4>
+          <p>Takes a Map and renders it into a DOM element. MapView = flat 2D. SceneView = globe/3D. You always need a View.</p>
+        </div>
+        <div class="concept-card">
+          <div class="icon" style="background:rgba(139,92,246,0.1)">📦</div>
+          <h4>Layers</h4>
+          <p>FeatureLayer (vector features), TileLayer (raster tiles), GraphicsLayer (custom drawing), ImageryLayer (rasters).</p>
+        </div>
+        <div class="concept-card">
+          <div class="icon" style="background:rgba(16,185,129,0.1)">🎨</div>
+          <h4>Renderers & Symbols</h4>
+          <p>Control how features look. SimpleRenderer = one style. UniqueValueRenderer = by category. ClassBreaksRenderer = by value range.</p>
+        </div>
+        <div class="concept-card">
+          <div class="icon" style="background:rgba(245,158,11,0.1)">💬</div>
+          <h4>PopupTemplate</h4>
+          <p>Defines what appears when a user clicks a feature. Can include field values, custom HTML, charts, and media.</p>
+        </div>
+        <div class="concept-card">
+          <div class="icon" style="background:rgba(239,68,68,0.1)">🔍</div>
+          <h4>Query / FeatureSet</h4>
+          <p>Query lets you filter features by SQL where-clause, geometry, distance. Returns a FeatureSet of matching graphics.</p>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <strong>📌 Key pattern</strong>
+        Everything in the SDK uses AMD-style ES module imports. You import each class from its own module path: <code style="font-family:var(--mono);font-size:12px;color:#c3e88d">@arcgis/core/Map.js</code>. This allows tree-shaking — only the code you use gets bundled.
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== JS LAYERS ====== -->
+  <div class="page" id="page-js-layers">
+    <div class="hero" style="margin-bottom:32px">
+      <div class="hero-badge" style="color:var(--sdk-js);border-color:rgba(59,130,246,0.3)">● MAPS SDK JS — LAYERS</div>
+      <div class="section-title">Layers & Data</div>
+      <div class="section-desc">Layers are how data gets into your map. Pick the right layer type for your data source.</div>
+    </div>
+
+    <table class="compare-table">
+      <thead><tr><th>Layer Type</th><th>Data Source</th><th>When to Use</th></tr></thead>
+      <tbody>
+        <tr><td>FeatureLayer</td><td>ArcGIS feature service URL</td><td>Interactive vector features (points, lines, polygons) with attributes</td></tr>
+        <tr><td>GraphicsLayer</td><td>In-memory graphics you create</td><td>Drawing tools, custom shapes, user-drawn features</td></tr>
+        <tr><td>TileLayer</td><td>Tile map service</td><td>Fast cached raster basemaps, non-interactive backgrounds</td></tr>
+        <tr><td>VectorTileLayer</td><td>Vector tile service</td><td>Styled basemaps (like Mapbox tiles) — fast and styleable</td></tr>
+        <tr><td>MapImageLayer</td><td>Map service (dynamic)</td><td>Complex multi-layer map services from ArcGIS Server</td></tr>
+        <tr><td>ImageryLayer</td><td>Image service</td><td>Satellite/aerial imagery, raster analysis</td></tr>
+        <tr><td>CSVLayer</td><td>CSV file URL</td><td>Quick display of spreadsheet data with lat/lon columns</td></tr>
+        <tr><td>GeoJSONLayer</td><td>GeoJSON URL / object</td><td>Open data, GitHub gists, external GeoJSON sources</td></tr>
+        <tr><td>WFSLayer</td><td>OGC WFS endpoint</td><td>Open standards, non-Esri GIS servers</td></tr>
+        <tr><td>GroupLayer</td><td>Collection of layers</td><td>Organize related layers, toggle multiple at once</td></tr>
+      </tbody>
+    </table>
+
+    <div class="info-box tip">
+      <strong>💡 FeatureLayer vs GraphicsLayer</strong>
+      FeatureLayer streams from a service and supports server-side queries, rendering, and editing. GraphicsLayer is purely in-memory — great for drawn or calculated shapes, but doesn't persist. For the Sketch widget, always use GraphicsLayer.
+    </div>
+  </div>
+
+  <!-- ====== JS WIDGETS ====== -->
+  <div class="page" id="page-js-widgets">
+    <div class="hero" style="margin-bottom:32px">
+      <div class="hero-badge" style="color:var(--sdk-js);border-color:rgba(59,130,246,0.3)">● MAPS SDK JS — WIDGETS</div>
+      <div class="section-title">Built-in Widgets</div>
+      <div class="section-desc">Drop these in with 3–5 lines of code. All widgets extend the Widget base class and accept a <code style="font-family:var(--mono);font-size:13px">view</code> property.</div>
+    </div>
+
+    <table class="compare-table">
+      <thead><tr><th>Widget</th><th>Import</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>Search</td><td><code style="font-family:var(--mono);font-size:11px">widgets/Search</code></td><td>Address geocoding, search feature layers</td></tr>
+        <tr><td>Legend</td><td><code style="font-family:var(--mono);font-size:11px">widgets/Legend</code></td><td>Show layer symbology key</td></tr>
+        <tr><td>LayerList</td><td><code style="font-family:var(--mono);font-size:11px">widgets/LayerList</code></td><td>Toggle layer visibility + legend actions</td></tr>
+        <tr><td>Sketch</td><td><code style="font-family:var(--mono);font-size:11px">widgets/Sketch</code></td><td>Draw points, lines, polygons on the map</td></tr>
+        <tr><td>Editor</td><td><code style="font-family:var(--mono);font-size:11px">widgets/Editor</code></td><td>Full feature editing (create / update / delete)</td></tr>
+        <tr><td>Expand</td><td><code style="font-family:var(--mono);font-size:11px">widgets/Expand</code></td><td>Collapsible container for any other widget</td></tr>
+        <tr><td>BasemapGallery</td><td><code style="font-family:var(--mono);font-size:11px">widgets/BasemapGallery</code></td><td>Switch between basemaps</td></tr>
+        <tr><td>ScaleBar</td><td><code style="font-family:var(--mono);font-size:11px">widgets/ScaleBar</code></td><td>Show map scale</td></tr>
+        <tr><td>Compass</td><td><code style="font-family:var(--mono);font-size:11px">widgets/Compass</code></td><td>North arrow — auto-shows when map is rotated</td></tr>
+        <tr><td>Measurement</td><td><code style="font-family:var(--mono);font-size:11px">widgets/Measurement</code></td><td>Measure distances and areas interactively</td></tr>
+        <tr><td>Print</td><td><code style="font-family:var(--mono);font-size:11px">widgets/Print</code></td><td>Export map to PDF / PNG via print service</td></tr>
+        <tr><td>Popup</td><td>Built into View</td><td>Auto-created — configure via PopupTemplate on each layer</td></tr>
+      </tbody>
+    </table>
+
+    <div class="info-box">
+      <strong>📐 View UI positions</strong>
+      <code style="font-family:var(--mono);font-size:12px;color:#c3e88d">view.ui.add(widget, "top-right")</code> — valid positions: <code style="font-family:var(--mono);font-size:11px">top-left</code>, <code style="font-family:var(--mono);font-size:11px">top-right</code>, <code style="font-family:var(--mono);font-size:11px">bottom-left</code>, <code style="font-family:var(--mono);font-size:11px">bottom-right</code>, <code style="font-family:var(--mono);font-size:11px">manual</code>.
+    </div>
+  </div>
+
+  <!-- ====== JS CODE ====== -->
+  <div class="page" id="page-js-code">
+    <div class="hero" style="margin-bottom:32px">
+      <div class="hero-badge" style="color:var(--sdk-js);border-color:rgba(59,130,246,0.3)">● MAPS SDK JS — EXAMPLES</div>
+      <div class="section-title">Code Examples</div>
+    </div>
+
+    <div class="section-block">
+      <div class="qr-tag">Example 1</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">minimal-map.js</span>
+          <span class="code-lang">JAVASCRIPT</span>
+        </div>
+        <pre><span class="cm">// Minimal working map — 12 lines</span>
+<span class="kw">import</span> Map <span class="kw">from</span> <span class="str">"@arcgis/core/Map.js"</span>;
+<span class="kw">import</span> MapView <span class="kw">from</span> <span class="str">"@arcgis/core/views/MapView.js"</span>;
+
+<span class="kw">const</span> map = <span class="kw">new</span> <span class="cls">Map</span>({ basemap: <span class="str">"streets-vector"</span> });
+
+<span class="kw">const</span> view = <span class="kw">new</span> <span class="cls">MapView</span>({
+  container: <span class="str">"viewDiv"</span>,  <span class="cm">// &lt;div id="viewDiv"&gt; in HTML</span>
+  map: map,
+  zoom: <span class="num">10</span>,
+  center: [<span class="num">-118.2</span>, <span class="num">34.0</span>]  <span class="cm">// [longitude, latitude]</span>
+});</pre>
+      </div>
+
+      <div class="qr-tag">Example 2</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">add-feature-layer.js</span>
+          <span class="code-lang">JAVASCRIPT</span>
+        </div>
+        <pre><span class="kw">import</span> FeatureLayer <span class="kw">from</span> <span class="str">"@arcgis/core/layers/FeatureLayer.js"</span>;
+
+<span class="kw">const</span> layer = <span class="kw">new</span> <span class="cls">FeatureLayer</span>({
+  url: <span class="str">"https://services.arcgis.com/.../FeatureServer/0"</span>,
+  outFields: [<span class="str">"*"</span>],  <span class="cm">// return all fields</span>
+  popupTemplate: {
+    title: <span class="str">"{NAME}"</span>,         <span class="cm">// {FIELD_NAME} syntax</span>
+    content: <span class="str">"{DESCRIPTION}"</span>
+  },
+  renderer: {
+    type: <span class="str">"simple"</span>,
+    symbol: {
+      type: <span class="str">"simple-marker"</span>,
+      color: <span class="str">"#3b82f6"</span>,
+      size: <span class="num">8</span>
+    }
+  }
+});
+
+map.add(layer);  <span class="cm">// or: map.layers.add(layer)</span></pre>
+      </div>
+
+      <div class="qr-tag">Example 3</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">query-features.js</span>
+          <span class="code-lang">JAVASCRIPT</span>
+        </div>
+        <pre><span class="cm">// Query features and log attributes</span>
+<span class="kw">const</span> query = layer.createQuery();
+query.where = <span class="str">"POPULATION > 100000"</span>;  <span class="cm">// SQL WHERE clause</span>
+query.geometry = view.extent;          <span class="cm">// spatial filter</span>
+query.spatialRelationship = <span class="str">"intersects"</span>;
+query.returnGeometry = <span class="kw">true</span>;
+query.outFields = [<span class="str">"NAME"</span>, <span class="str">"POPULATION"</span>];
+
+<span class="kw">const</span> result = <span class="kw">await</span> layer.<span class="fn">queryFeatures</span>(query);
+result.features.<span class="fn">forEach</span>(f => {
+  console.<span class="fn">log</span>(f.attributes.<span class="prop">NAME</span>, f.attributes.<span class="prop">POPULATION</span>);
+});</pre>
+      </div>
+
+      <div class="qr-tag">Example 4</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">sketch-widget.js</span>
+          <span class="code-lang">JAVASCRIPT</span>
+        </div>
+        <pre><span class="kw">import</span> GraphicsLayer <span class="kw">from</span> <span class="str">"@arcgis/core/layers/GraphicsLayer.js"</span>;
+<span class="kw">import</span> Sketch <span class="kw">from</span> <span class="str">"@arcgis/core/widgets/Sketch.js"</span>;
+
+<span class="kw">const</span> sketchLayer = <span class="kw">new</span> <span class="cls">GraphicsLayer</span>();
+map.<span class="fn">add</span>(sketchLayer);
+
+<span class="kw">const</span> sketch = <span class="kw">new</span> <span class="cls">Sketch</span>({
+  layer: sketchLayer,
+  view: view,
+  creationMode: <span class="str">"update"</span>
+});
+view.ui.<span class="fn">add</span>(sketch, <span class="str">"top-right"</span>);
+
+sketch.<span class="fn">on</span>(<span class="str">"create"</span>, (event) => {
+  <span class="kw">if</span> (event.state === <span class="str">"complete"</span>) {
+    console.<span class="fn">log</span>(<span class="str">"Drawn geometry:"</span>, event.graphic.geometry);
+  }
+});</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== EXB CORE ====== -->
+  <div class="page" id="page-exb-core">
+    <div class="hero" style="margin-bottom:36px">
+      <div class="hero-badge" style="color:var(--sdk-exb);border-color:rgba(6,182,212,0.3)">● EXPERIENCE BUILDER DEV EDITION</div>
+      <div class="section-title">Core Concepts</div>
+      <div class="section-desc">ExB Dev Edition = ArcGIS Experience Builder + the ability to write custom React widgets using the Jimu framework.</div>
+    </div>
+
+    <div class="section-block">
+      <div class="highlight-row">
+        <div class="highlight-box">
+          <h4 style="color:var(--sdk-exb)">What ExB gives you</h4>
+          <ul>
+            <li>Drag-and-drop web app builder</li>
+            <li>Connects to ArcGIS Online / Enterprise</li>
+            <li>Built-in widgets: Map, List, Table, Chart...</li>
+            <li>Data linking between widgets</li>
+            <li>No-code layout builder</li>
+          </ul>
+        </div>
+        <div class="highlight-box">
+          <h4 style="color:var(--sdk-exb)">What Dev Edition adds</h4>
+          <ul>
+            <li>Write custom React widgets</li>
+            <li>Access the Jimu (吉mu) framework</li>
+            <li>Use JimuMapView to control maps</li>
+            <li>Connect custom widget to data sources</li>
+            <li>Hot reload dev server</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section-label">Key Concepts</div>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="icon" style="background:rgba(6,182,212,0.1)">🧩</div>
+          <h4>Widget</h4>
+          <p>A React component in <code style="font-family:var(--mono);font-size:11px">your-widget/src/runtime/widget.tsx</code>. Receives <code style="font-family:var(--mono);font-size:11px">props</code> from ExB including data sources and map.</p>
+        </div>
+        <div class="concept-card">
+          <div class="icon" style="background:rgba(6,182,212,0.1)">⚙️</div>
+          <h4>Setting panel</h4>
+          <p>The config UI shown when an author edits the widget in ExB builder. Defined in <code style="font-family:var(--mono);font-size:11px">setting/setting.tsx</code>.</p>
+        </div>
+        <div class="concept-card">
+          <div class="icon" style="background:rgba(6,182,212,0.1)">🗄</div>
+          <h4>Data source</h4>
+          <p>Connection to a feature service or table. Use <code style="font-family:var(--mono);font-size:11px">useDataSource</code> in manifest to declare, then <code style="font-family:var(--mono);font-size:11px">DataSourceComponent</code> to consume.</p>
+        </div>
+        <div class="concept-card">
+          <div class="icon" style="background:rgba(6,182,212,0.1)">🗺</div>
+          <h4>JimuMapView</h4>
+          <p>The ExB wrapper around a MapView. Get it via <code style="font-family:var(--mono);font-size:11px">JimuMapViewComponent</code> to access the underlying ArcGIS MapView.</p>
+        </div>
+        <div class="concept-card">
+          <div class="icon" style="background:rgba(6,182,212,0.1)">📋</div>
+          <h4>manifest.json</h4>
+          <p>Declares widget metadata, dependencies, use maps, use data sources. ExB reads this to wire your widget into the builder.</p>
+        </div>
+        <div class="concept-card">
+          <div class="icon" style="background:rgba(6,182,212,0.1)">🔗</div>
+          <h4>Message / Action</h4>
+          <p>Widgets communicate via the message framework — one widget publishes, another subscribes. No direct component coupling.</p>
+        </div>
+      </div>
+
+      <div class="info-box warn">
+        <strong>⚠️ Jimu ≠ standard React</strong>
+        ExB uses the "Jimu" framework on top of React. Don't use <code style="font-family:var(--mono);font-size:12px">useState</code> for settings — use <code style="font-family:var(--mono);font-size:12px">props.config</code> and <code style="font-family:var(--mono);font-size:12px">props.onSettingChange</code>. Widget state is managed by ExB's Redux store.
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-label">Widget folder structure</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">custom-widget/ folder layout</span>
+          <span class="code-lang">STRUCTURE</span>
+        </div>
+        <pre><span class="cm">your-widget/</span>
+<span class="prop">├── manifest.json</span>       <span class="cm">← metadata, deps, config shape</span>
+<span class="prop">├── src/</span>
+<span class="prop">│   ├── runtime/</span>
+<span class="prop">│   │   └── widget.tsx</span>  <span class="cm">← the actual React widget</span>
+<span class="prop">│   ├── setting/</span>
+<span class="prop">│   │   └── setting.tsx</span> <span class="cm">← config panel in builder</span>
+<span class="prop">│   └── config.ts</span>       <span class="cm">← TypeScript config types</span>
+<span class="prop">└── icon.svg</span>            <span class="cm">← widget icon in builder palette</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== EXB WIDGET ====== -->
+  <div class="page" id="page-exb-widget">
+    <div class="hero" style="margin-bottom:32px">
+      <div class="hero-badge" style="color:var(--sdk-exb);border-color:rgba(6,182,212,0.3)">● EXPERIENCE BUILDER — CUSTOM WIDGET</div>
+      <div class="section-title">Building a Custom Widget</div>
+    </div>
+
+    <ol class="step-list">
+      <li><strong>Install ExB Dev Edition</strong> — Download from My Esri. Node.js 16+ required. Run <code style="font-family:var(--mono);font-size:12px">npm ci</code> in the ExB folder then <code style="font-family:var(--mono);font-size:12px">npm start</code>.</li>
+      <li><strong>Create widget folder</strong> — Place your widget in <code style="font-family:var(--mono);font-size:12px">client/your-extensions/widgets/my-widget/</code></li>
+      <li><strong>Write manifest.json</strong> — Declare the widget name, version, dependencies (use maps, data sources).</li>
+      <li><strong>Build widget.tsx</strong> — Export a React component as default. Receives AllWidgetProps from Jimu.</li>
+      <li><strong>Build setting.tsx</strong> — Optional config panel. Use Jimu UI components (Button, TextInput, etc).</li>
+      <li><strong>Hot reload</strong> — Save files, ExB dev server reloads automatically. Open <code style="font-family:var(--mono);font-size:12px">localhost:3001</code> to test.</li>
+      <li><strong>Deploy</strong> — Copy your widget folder into the production ExB <code style="font-family:var(--mono);font-size:12px">widgets/</code> folder.</li>
+    </ol>
+
+    <div class="info-box pro-tip">
+      <strong>🎯 Pro tip — use JimuMapViewComponent</strong>
+      To interact with the map from your widget, add <code style="font-family:var(--mono);font-size:12px">useMapWidgetIds</code> to manifest.json, then use <code style="font-family:var(--mono);font-size:12px">&lt;JimuMapViewComponent onActiveViewChange={...}&gt;</code> in widget.tsx. The callback gives you the live ArcGIS MapView instance.
+    </div>
+  </div>
+
+  <!-- ====== EXB CODE ====== -->
+  <div class="page" id="page-exb-code">
+    <div class="hero" style="margin-bottom:32px">
+      <div class="hero-badge" style="color:var(--sdk-exb);border-color:rgba(6,182,212,0.3)">● EXB DEV EDITION — EXAMPLES</div>
+      <div class="section-title">Code Examples</div>
+    </div>
+
+    <div class="qr-tag">manifest.json</div>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">manifest.json</span>
+        <span class="code-lang">JSON</span>
+      </div>
+      <pre>{
+  <span class="prop">"name"</span>: <span class="str">"my-custom-widget"</span>,
+  <span class="prop">"label"</span>: <span class="str">"My Widget"</span>,
+  <span class="prop">"version"</span>: <span class="str">"1.0.0"</span>,
+  <span class="prop">"jimuVersion"</span>: <span class="str">">=1.0.0"</span>,
+  <span class="prop">"properties"</span>: {},
+  <span class="prop">"dependencies"</span>: [<span class="str">"jimu-core"</span>, <span class="str">"jimu-arcgis"</span>],
+  <span class="prop">"useMapWidgetIds"</span>: <span class="kw">true</span>,     <span class="cm">// enables JimuMapViewComponent</span>
+  <span class="prop">"useDataSources"</span>: [{           <span class="cm">// connect a data source</span>
+    <span class="prop">"types"</span>: [<span class="str">"FEATURE_LAYER"</span>]
+  }]
+}</pre>
+    </div>
+
+    <div class="qr-tag">widget.tsx — map interaction</div>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">src/runtime/widget.tsx</span>
+        <span class="code-lang">TSX</span>
+      </div>
+      <pre><span class="kw">import</span> { React, AllWidgetProps } <span class="kw">from</span> <span class="str">"jimu-core"</span>;
+<span class="kw">import</span> { JimuMapViewComponent, JimuMapView } <span class="kw">from</span> <span class="str">"jimu-arcgis"</span>;
+
+<span class="kw">export default function</span> <span class="fn">Widget</span>(props: <span class="cls">AllWidgetProps</span>&lt;any&gt;) {
+  <span class="kw">const</span> [mapView, setMapView] = React.<span class="fn">useState</span>&lt;<span class="cls">JimuMapView</span>&gt;(<span class="kw">null</span>);
+
+  <span class="kw">const</span> <span class="fn">handleViewChange</span> = (jmv: <span class="cls">JimuMapView</span>) => {
+    setMapView(jmv);
+    <span class="cm">// jmv.view is the actual ArcGIS MapView</span>
+    console.<span class="fn">log</span>(<span class="str">"Map ready:"</span>, jmv.view);
+  };
+
+  <span class="kw">const</span> <span class="fn">zoomToLA</span> = () => {
+    <span class="kw">if</span> (!mapView) <span class="kw">return</span>;
+    mapView.view.<span class="fn">goTo</span>({ center: [<span class="num">-118.2</span>, <span class="num">34</span>], zoom: <span class="num">12</span> });
+  };
+
+  <span class="kw">return</span> (
+    &lt;div&gt;
+      &lt;<span class="cls">JimuMapViewComponent</span>
+        useMapWidgetId={props.useMapWidgetIds?.[<span class="num">0</span>]}
+        onActiveViewChange={handleViewChange}
+      /&gt;
+      &lt;button onClick={zoomToLA}&gt;Zoom to LA&lt;/button&gt;
+    &lt;/div&gt;
+  );
+}</pre>
+    </div>
+  </div>
+
+  <!-- ====== PRO CORE ====== -->
+  <div class="page" id="page-pro-core">
+    <div class="hero" style="margin-bottom:36px">
+      <div class="hero-badge" style="color:var(--sdk-pro);border-color:rgba(139,92,246,0.3)">● ARCGIS PRO SDK FOR .NET</div>
+      <div class="section-title">Core Concepts</div>
+      <div class="section-desc">The Pro SDK lets you write C# add-ins that run inside ArcGIS Pro. Think of it like a plugin system — your code lives inside the Pro process.</div>
+    </div>
+
+    <div class="section-block">
+      <div class="highlight-row">
+        <div class="highlight-box">
+          <h4 style="color:var(--sdk-pro)">What you can build</h4>
+          <ul>
+            <li>Custom buttons in the Pro ribbon</li>
+            <li>Dockable panes (custom panels)</li>
+            <li>Map tools (click/drag interactions)</li>
+            <li>Geoprocessing tool wrappers</li>
+            <li>Custom sketch tools</li>
+          </ul>
+        </div>
+        <div class="highlight-box">
+          <h4 style="color:var(--sdk-pro)">Key requirement</h4>
+          <ul>
+            <li>Windows only (ArcGIS Pro is Windows)</li>
+            <li>C# / VB.NET + Visual Studio</li>
+            <li>Pro SDK NuGet package</li>
+            <li>.NET 6+ (Pro 3.x)</li>
+            <li>ArcGIS Pro installed</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="icon" style="background:rgba(139,92,246,0.1)">🔌</div>
+          <h4>Add-in</h4>
+          <p>A .esriAddinX file deployed to ArcGIS Pro. Contains all your custom buttons, panes, and tools. Registered via config.daml.</p>
+        </div>
+        <div class="concept-card">
+          <div class="icon" style="background:rgba(139,92,246,0.1)">📄</div>
+          <h4>config.daml</h4>
+          <p>XML manifest for the add-in. Declares buttons, menus, panes, conditions, and where they appear in the Pro UI (ribbon groups).</p>
+        </div>
+        <div class="concept-card">
+          <div class="icon" style="background:rgba(139,92,246,0.1)">⚡</div>
+          <h4>MCT (Main CIM Thread)</h4>
+          <p>Pro uses a strict threading model. All map/layer access MUST run on the MCT via <code style="font-family:var(--mono);font-size:11px">QueuedTask.Run()</code>.</p>
+        </div>
+        <div class="concept-card">
+          <div class="icon" style="background:rgba(139,92,246,0.1)">🗺</div>
+          <h4>MapView</h4>
+          <p>The Pro equivalent of a map display. Access via <code style="font-family:var(--mono);font-size:11px">MapView.Active</code>. Not the same as JS SDK's MapView.</p>
+        </div>
+        <div class="concept-card">
+          <div class="icon" style="background:rgba(139,92,246,0.1)">🔧</div>
+          <h4>MapTool</h4>
+          <p>Base class for custom map interactions. Override <code style="font-family:var(--mono);font-size:11px">OnSketchCompleteAsync</code> to handle drawn geometry.</p>
+        </div>
+        <div class="concept-card">
+          <div class="icon" style="background:rgba(139,92,246,0.1)">📊</div>
+          <h4>CIM (Cartographic Info Model)</h4>
+          <p>The JSON-like model behind Pro's symbols, renderers, and layouts. You can get/set CIM directly for advanced customization.</p>
+        </div>
+      </div>
+
+      <div class="info-box warn">
+        <strong>⚠️ Threading is critical in Pro SDK</strong>
+        Never access map layers or geodatabases on a background thread. Always wrap operations in <code style="font-family:var(--mono);font-size:12px">await QueuedTask.Run(() => { ... })</code>. Breaking this causes cryptic exceptions.
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== PRO CODE ====== -->
+  <div class="page" id="page-pro-code">
+    <div class="hero" style="margin-bottom:32px">
+      <div class="hero-badge" style="color:var(--sdk-pro);border-color:rgba(139,92,246,0.3)">● PRO SDK — EXAMPLES</div>
+      <div class="section-title">Code Examples</div>
+    </div>
+
+    <div class="qr-tag">Button add-in — select features in extent</div>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">SelectByExtentButton.cs</span>
+        <span class="code-lang">C#</span>
+      </div>
+      <pre><span class="kw">using</span> ArcGIS.Desktop.Framework.Contracts;
+<span class="kw">using</span> ArcGIS.Desktop.Mapping;
+<span class="kw">using</span> ArcGIS.Desktop.Framework.Threading.Tasks;
+
+<span class="kw">internal class</span> <span class="cls">SelectByExtentButton</span> : <span class="cls">Button</span>
+{
+  <span class="kw">protected override async void</span> <span class="fn">OnClick</span>()
+  {
+    <span class="cm">// Always use QueuedTask for map access</span>
+    <span class="kw">await</span> QueuedTask.<span class="fn">Run</span>(() =>
+    {
+      <span class="kw">var</span> mapView = MapView.Active;
+      <span class="kw">if</span> (mapView == <span class="kw">null</span>) <span class="kw">return</span>;
+
+      <span class="cm">// Get current map extent</span>
+      <span class="kw">var</span> extent = mapView.Extent;
+
+      <span class="cm">// Select features in the extent</span>
+      mapView.Map.<span class="fn">SelectByRectangle</span>(
+        mapView,
+        extent.<span class="fn">ToEnvelope</span>(),
+        SelectionCombinationMethod.New
+      );
+    });
+  }
+}</pre>
+    </div>
+
+    <div class="qr-tag">Custom map tool — click to get coordinates</div>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">CoordinateClickTool.cs</span>
+        <span class="code-lang">C#</span>
+      </div>
+      <pre><span class="kw">internal class</span> <span class="cls">CoordinateClickTool</span> : <span class="cls">MapTool</span>
+{
+  <span class="kw">public</span> <span class="fn">CoordinateClickTool</span>()
+  {
+    IsSketchTool = <span class="kw">true</span>;
+    SketchType = SketchGeometryType.Point;
+  }
+
+  <span class="kw">protected override Task</span>&lt;<span class="kw">bool</span>&gt; <span class="fn">OnSketchCompleteAsync</span>(
+    Geometry geometry)
+  {
+    <span class="kw">return</span> QueuedTask.<span class="fn">Run</span>(() =>
+    {
+      <span class="kw">var</span> point = geometry <span class="kw">as</span> MapPoint;
+      <span class="kw">var</span> msg = <span class="str">$"X: {point.X:F4}, Y: {point.Y:F4}"</span>;
+      ArcGIS.Desktop.Framework.Dialogs.MessageBox
+        .<span class="fn">Show</span>(msg, <span class="str">"Clicked Point"</span>);
+      <span class="kw">return true</span>;
+    });
+  }
+}</pre>
+    </div>
+
+    <div class="qr-tag">config.daml — register the button</div>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">Config.daml (excerpt)</span>
+        <span class="code-lang">XML</span>
+      </div>
+      <pre><span class="cm">&lt;!-- In ArcGIS Pro ribbon --&gt;</span>
+&lt;<span class="cls">button</span> id=<span class="str">"MyAddin_SelectByExtentButton"</span>
+        caption=<span class="str">"Select by Extent"</span>
+        className=<span class="str">"SelectByExtentButton"</span>
+        loadOnClick=<span class="str">"true"</span>
+        smallImage=<span class="str">"Images\Select16.png"</span>
+        largeImage=<span class="str">"Images\Select32.png"</span>&gt;
+  &lt;tooltip heading=<span class="str">"Select Features"</span>&gt;
+    Selects all features within the current extent.
+  &lt;/tooltip&gt;
+&lt;/<span class="cls">button</span>&gt;</pre>
+    </div>
+  </div>
+
+  <!-- ====== ENT CORE ====== -->
+  <div class="page" id="page-ent-core">
+    <div class="hero" style="margin-bottom:36px">
+      <div class="hero-badge" style="color:var(--sdk-ent);border-color:rgba(245,158,11,0.3)">● ARCGIS ENTERPRISE SDK</div>
+      <div class="section-title">Core Concepts</div>
+      <div class="section-desc">The Enterprise SDK lets you extend ArcGIS Server — adding custom REST endpoints (SOE) or intercepting existing ones (SOI). Runs server-side, not in the browser.</div>
+    </div>
+
+    <div class="section-block">
+      <div class="flow-diagram">
+        <svg viewBox="0 0 800 140" class="mindmap-svg">
+          <defs>
+            <marker id="arr4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+              <path d="M2 1L8 5L2 9" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </marker>
+          </defs>
+          <!-- Client -->
+          <rect x="20" y="40" width="120" height="60" rx="8" fill="rgba(245,158,11,0.07)" stroke="rgba(245,158,11,0.3)" stroke-width="1"/>
+          <text x="80" y="67" text-anchor="middle" font-family="Syne,sans-serif" font-size="12" font-weight="700" fill="#fcd34d">Client</text>
+          <text x="80" y="84" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" fill="#64748b">Browser / App</text>
+
+          <line x1="140" y1="70" x2="178" y2="70" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arr4)"/>
+
+          <!-- SOI intercepts -->
+          <rect x="180" y="30" width="130" height="80" rx="8" fill="rgba(245,158,11,0.12)" stroke="rgba(245,158,11,0.5)" stroke-width="1"/>
+          <text x="245" y="57" text-anchor="middle" font-family="Syne,sans-serif" font-size="12" font-weight="700" fill="#fcd34d">SOI</text>
+          <text x="245" y="73" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" fill="#94a3b8">Interceptor</text>
+          <text x="245" y="88" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" fill="#64748b">modifies requests</text>
+
+          <line x1="310" y1="70" x2="348" y2="70" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arr4)"/>
+
+          <!-- ArcGIS Server -->
+          <rect x="350" y="30" width="160" height="80" rx="8" fill="rgba(245,158,11,0.07)" stroke="rgba(245,158,11,0.3)" stroke-width="1"/>
+          <text x="430" y="65" text-anchor="middle" font-family="Syne,sans-serif" font-size="12" font-weight="700" fill="#fcd34d">ArcGIS Server</text>
+          <text x="430" y="82" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" fill="#64748b">Map / Feature Services</text>
+
+          <line x1="510" y1="70" x2="548" y2="70" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arr4)"/>
+
+          <!-- SOE extends -->
+          <rect x="550" y="30" width="130" height="80" rx="8" fill="rgba(245,158,11,0.12)" stroke="rgba(245,158,11,0.5)" stroke-width="1"/>
+          <text x="615" y="57" text-anchor="middle" font-family="Syne,sans-serif" font-size="12" font-weight="700" fill="#fcd34d">SOE</text>
+          <text x="615" y="73" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" fill="#94a3b8">Extension</text>
+          <text x="615" y="88" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" fill="#64748b">adds new endpoints</text>
+
+          <text x="400" y="128" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#475569">SOI intercepts the pipeline. SOE adds new REST endpoints to a service.</text>
+        </svg>
+      </div>
+
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="icon" style="background:rgba(245,158,11,0.1)">🔌</div>
+          <h4>SOE (Server Object Extension)</h4>
+          <p>Adds custom REST operations to an existing service. Clients call <code style="font-family:var(--mono);font-size:11px">/exts/MySOE/customOp</code>. Best for adding new business logic endpoints.</p>
+        </div>
+        <div class="concept-card">
+          <div class="icon" style="background:rgba(245,158,11,0.1)">🚧</div>
+          <h4>SOI (Server Object Interceptor)</h4>
+          <p>Intercepts all requests to a service before they're processed. Use for custom auth, logging, request filtering, or modifying responses.</p>
+        </div>
+        <div class="concept-card">
+          <div class="icon" style="background:rgba(245,158,11,0.1)">📦</div>
+          <h4>.soe file</html></h4>
+          <p>The compiled output — a JAR (Java) or DLL (.NET) wrapped in a .soe package. Registered in ArcGIS Server Manager under Extensions.</p>
+        </div>
+        <div class="concept-card">
+          <div class="icon" style="background:rgba(245,158,11,0.1)">🔒</div>
+          <h4>IServerObjectExtension</h4>
+          <p>The main interface to implement. Includes <code style="font-family:var(--mono);font-size:11px">Init()</code>, <code style="font-family:var(--mono);font-size:11px">Shutdown()</code>, and for SOE, <code style="font-family:var(--mono);font-size:11px">HandleRESTRequest()</code>.</p>
+        </div>
+        <div class="concept-card">
+          <div class="icon" style="background:rgba(245,158,11,0.1)">🌐</div>
+          <h4>REST capabilities</h4>
+          <p>Your SOE declares its operations in JSON. Each operation has a name, parameters, and a return type. ArcGIS Server auto-generates the REST endpoint docs.</p>
+        </div>
+        <div class="concept-card">
+          <div class="icon" style="background:rgba(245,158,11,0.1)">📝</div>
+          <h4>Geodatabase access</h4>
+          <p>SOEs can access feature classes, tables, and workspaces server-side via the ArcObjects / ArcGIS Engine API behind the scenes.</p>
+        </div>
+      </div>
+
+      <div class="info-box warn">
+        <strong>⚠️ Enterprise SDK is advanced</strong>
+        This SDK requires deep ArcGIS Server knowledge, Java or .NET, and deployment to a live server. Mistakes can break services for all users. Test in a dev environment first.
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== ENT CODE ====== -->
+  <div class="page" id="page-ent-code">
+    <div class="hero" style="margin-bottom:32px">
+      <div class="hero-badge" style="color:var(--sdk-ent);border-color:rgba(245,158,11,0.3)">● ENTERPRISE SDK — EXAMPLES</div>
+      <div class="section-title">Code Examples</div>
+    </div>
+
+    <div class="qr-tag">SOE skeleton — Java</div>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">MyCustomSOE.java</span>
+        <span class="code-lang">JAVA</span>
+      </div>
+      <pre><span class="kw">import</span> com.esri.arcgis.server.json.*;
+<span class="kw">import</span> com.esri.arcgis.interop.AutomationException;
+
+<span class="kw">public class</span> <span class="cls">MyCustomSOE</span>
+  <span class="kw">implements</span> <span class="cls">IServerObjectExtension</span>,
+             <span class="cls">IRESTRequestHandler</span>
+{
+  <span class="kw">private</span> IServerObjectHelper soHelper;
+
+  <span class="kw">public void</span> <span class="fn">init</span>(IServerObjectHelper soh) <span class="kw">throws</span> Exception {
+    <span class="kw">this</span>.soHelper = soh;
+    <span class="cm">// init geodatabase connections, caches, etc.</span>
+  }
+
+  <span class="kw">public void</span> <span class="fn">shutdown</span>() <span class="kw">throws</span> Exception {
+    <span class="cm">// release resources</span>
+  }
+
+  <span class="kw">public byte</span>[] <span class="fn">handleRESTRequest</span>(
+    String capabilities, String resourceName,
+    String operationName, String operationInput,
+    String outputFormat, String requestProperties,
+    String[] responseProperties) <span class="kw">throws</span> Exception
+  {
+    <span class="kw">if</span> (operationName.<span class="fn">equalsIgnoreCase</span>(<span class="str">"getStats"</span>)) {
+      <span class="kw">return</span> <span class="fn">handleGetStats</span>(operationInput);
+    }
+    <span class="kw">return new</span> JSONObject().<span class="fn">put</span>(<span class="str">"error"</span>, <span class="str">"Unknown operation"</span>)
+      .<span class="fn">toString</span>().<span class="fn">getBytes</span>(<span class="str">"UTF-8"</span>);
+  }
+
+  <span class="kw">private byte</span>[] <span class="fn">handleGetStats</span>(String input) <span class="kw">throws</span> Exception {
+    JSONObject result = <span class="kw">new</span> <span class="cls">JSONObject</span>();
+    result.<span class="fn">put</span>(<span class="str">"featureCount"</span>, <span class="num">1234</span>);
+    result.<span class="fn">put</span>(<span class="str">"status"</span>, <span class="str">"ok"</span>);
+    <span class="kw">return</span> result.<span class="fn">toString</span>().<span class="fn">getBytes</span>(<span class="str">"UTF-8"</span>);
+  }
+}</pre>
+    </div>
+  </div>
+
+  <!-- ====== TIPS ====== -->
+  <div class="page" id="page-tips">
+    <div class="hero" style="margin-bottom:32px">
+      <div class="hero-badge" style="color:#f472b6;border-color:rgba(244,114,182,0.3)">● CLAUDE'S PERSPECTIVE</div>
+      <div class="section-title">Insights & Pro Tips</div>
+      <div class="section-desc">Things I'd tell a developer starting out with ArcGIS SDKs that the official docs don't always say clearly.</div>
+    </div>
+
+    <div class="section-block">
+      <div class="info-box pro-tip">
+        <strong>🧭 Start with the right SDK</strong>
+        The #1 mistake is starting with ExB Dev Edition thinking it's simpler. It's not — you're writing React inside a proprietary framework. If you know web dev, Maps SDK JS is far more approachable. ExB is best if your org is already on ArcGIS Online/Enterprise and you're extending existing apps.
+      </div>
+
+      <div class="info-box tip">
+        <strong>💡 Maps SDK JS: AMD vs ES modules</strong>
+        The SDK supports two loading patterns. CDN (via &lt;script&gt; tag) uses AMD. npm uses ES modules. They look different but do the same thing. For new projects always use npm + ES modules — you get TypeScript types, tree-shaking, and bundler support.
+      </div>
+
+      <div class="info-box">
+        <strong>📌 The View is async — use .when()</strong>
+        <code style="font-family:var(--mono);font-size:12px">view.when()</code> returns a Promise that resolves when the map is ready. Always wait for it before querying layers or zooming programmatically. <code style="font-family:var(--mono);font-size:12px">await view.when()</code> is the correct pattern.
+      </div>
+
+      <div class="info-box warn">
+        <strong>⚠️ Pro SDK: the MCT threading rule will break you</strong>
+        ArcGIS Pro enforces a strict threading model. When you get a <code style="font-family:var(--mono);font-size:12px">CalledOnWrongThreadException</code>, it means you touched map data outside <code style="font-family:var(--mono);font-size:12px">QueuedTask.Run()</code>. This is by far the most common Pro SDK frustration — memorize this pattern early.
+      </div>
+
+      <div class="info-box tip">
+        <strong>💡 FeatureLayer: use definitionExpression for performance</strong>
+        Instead of querying and filtering client-side, set <code style="font-family:var(--mono);font-size:12px">layer.definitionExpression = "STATUS = 'ACTIVE'"</code> — this filters server-side and only streams matching features to the browser. Massive performance gain on large datasets.
+      </div>
+
+      <div class="info-box pro-tip">
+        <strong>🎯 Enterprise SDK: SOE vs SOI decision</strong>
+        Ask: do you need to ADD new functionality (new endpoint)? → SOE. Do you need to INTERCEPT or MODIFY existing behavior (auth, logging, transform output)? → SOI. Many teams use both: SOI for auth/logging, SOE for business logic endpoints.
+      </div>
+
+      <div class="info-box">
+        <strong>📌 ExB: don't fight Jimu's data model</strong>
+        Jimu manages widget state and data flow via its own Redux store. Don't use <code style="font-family:var(--mono);font-size:12px">localStorage</code> or global variables to pass data between widgets. Use the Message/Action framework — it's verbose but it's the correct pattern, and it makes your widget work in published apps.
+      </div>
+
+      <div class="info-box tip">
+        <strong>💡 Use the ArcGIS Playground</strong>
+        <code style="font-family:var(--mono);font-size:12px">developers.arcgis.com/javascript/latest/sample-code/</code> has 400+ live samples. The fastest way to learn is to fork a sample close to what you need rather than building from scratch.
+      </div>
+
+      <div class="info-box pro-tip">
+        <strong>🎯 Learn these 5 things first for JS SDK</strong>
+        (1) Map + MapView basics. (2) FeatureLayer + popupTemplate. (3) Query / queryFeatures. (4) view.on("click", ...) for interactivity. (5) view.ui.add() for widgets. Everything else builds on these.
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== CHEATSHEET ====== -->
+  <div class="page" id="page-cheatsheet">
+    <div class="hero" style="margin-bottom:32px">
+      <div class="hero-badge" style="color:#f472b6;border-color:rgba(244,114,182,0.3)">● QUICK REFERENCE</div>
+      <div class="section-title">Cheat Sheet</div>
+      <div class="section-desc">Copy-paste patterns for daily use.</div>
+    </div>
+
+    <div class="cheat-grid">
+      <div class="cheat-item">
+        <div class="cheat-item-header">
+          <span class="badge badge-js">JS SDK</span> Basemaps
+        </div>
+        <pre><span class="cm">// Built-in basemap strings:</span>
+<span class="str">"streets-vector"</span>
+<span class="str">"topo-vector"</span>
+<span class="str">"satellite"</span>
+<span class="str">"hybrid"</span>
+<span class="str">"dark-gray-vector"</span>
+<span class="str">"gray-vector"</span>
+<span class="str">"oceans"</span></pre>
+      </div>
+
+      <div class="cheat-item">
+        <div class="cheat-item-header">
+          <span class="badge badge-js">JS SDK</span> GoTo location
+        </div>
+        <pre><span class="cm">// Pan + zoom to coordinates</span>
+<span class="kw">await</span> view.<span class="fn">goTo</span>({
+  center: [lng, lat],
+  zoom: <span class="num">12</span>,
+  tilt: <span class="num">0</span>   <span class="cm">// SceneView only</span>
+});
+
+<span class="cm">// Zoom to a graphic's geometry</span>
+<span class="kw">await</span> view.<span class="fn">goTo</span>(graphic.geometry);</pre>
+      </div>
+
+      <div class="cheat-item">
+        <div class="cheat-item-header">
+          <span class="badge badge-js">JS SDK</span> Click handler
+        </div>
+        <pre>view.<span class="fn">on</span>(<span class="str">"click"</span>, <span class="kw">async</span> (event) => {
+  <span class="kw">const</span> response = <span class="kw">await</span> view.<span class="fn">hitTest</span>(event);
+  <span class="kw">const</span> feature = response.results
+    .<span class="fn">find</span>(r => r.graphic?.layer);
+  <span class="kw">if</span> (feature) {
+    console.<span class="fn">log</span>(feature.graphic.attributes);
+  }
+});</pre>
+      </div>
+
+      <div class="cheat-item">
+        <div class="cheat-item-header">
+          <span class="badge badge-js">JS SDK</span> Add graphic manually
+        </div>
+        <pre><span class="kw">import</span> Graphic <span class="kw">from</span> <span class="str">"@arcgis/core/Graphic.js"</span>;
+<span class="kw">import</span> Point <span class="kw">from</span> <span class="str">"@arcgis/core/geometry/Point.js"</span>;
+
+<span class="kw">const</span> g = <span class="kw">new</span> <span class="cls">Graphic</span>({
+  geometry: <span class="kw">new</span> <span class="cls">Point</span>({ longitude: <span class="num">-118</span>, latitude: <span class="num">34</span> }),
+  symbol: { type: <span class="str">"simple-marker"</span>, color: <span class="str">"red"</span> },
+  attributes: { name: <span class="str">"My point"</span> }
+});
+graphicsLayer.<span class="fn">add</span>(g);</pre>
+      </div>
+
+      <div class="cheat-item">
+        <div class="cheat-item-header">
+          <span class="badge badge-pro">PRO SDK</span> QueuedTask pattern
+        </div>
+        <pre><span class="cm">// Always wrap map access</span>
+<span class="kw">await</span> QueuedTask.<span class="fn">Run</span>(() =>
+{
+  <span class="kw">var</span> map = MapView.Active?.Map;
+  <span class="kw">if</span> (map == <span class="kw">null</span>) <span class="kw">return</span>;
+
+  <span class="kw">foreach</span> (<span class="kw">var</span> layer <span class="kw">in</span> map.Layers)
+    System.Diagnostics.Debug
+      .<span class="fn">WriteLine</span>(layer.Name);
+});</pre>
+      </div>
+
+      <div class="cheat-item">
+        <div class="cheat-item-header">
+          <span class="badge badge-exb">ExB Dev</span> Minimal widget.tsx
+        </div>
+        <pre><span class="kw">import</span> { React, AllWidgetProps } <span class="kw">from</span> <span class="str">"jimu-core"</span>;
+
+<span class="kw">export default function</span> <span class="fn">Widget</span>(
+  props: <span class="cls">AllWidgetProps</span>&lt;any&gt;
+) {
+  <span class="kw">return</span> (
+    &lt;div className=<span class="str">"widget-my-widget"</span>&gt;
+      &lt;h3&gt;Hello ExB!&lt;/h3&gt;
+    &lt;/div&gt;
+  );
+}</pre>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+  function goto(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const page = document.getElementById('page-' + id);
+    if (page) page.classList.add('active');
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(n => {
+      if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + id + "'")) {
+        n.classList.add('active');
+      }
+    });
+    document.querySelector('.main').scrollTo ? document.querySelector('.main').scrollTo(0,0) : window.scrollTo(0,0);
+  }
+
+  function switchSDK(sdk) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`[data-sdk="${sdk}"]`).classList.add('active');
+    const map = { js: 'js-core', exb: 'exb-core', pro: 'pro-core', ent: 'ent-core' };
+    goto(map[sdk]);
+  }
+</script>
+</body>
+</html>
